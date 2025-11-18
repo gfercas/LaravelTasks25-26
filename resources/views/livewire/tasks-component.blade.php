@@ -26,7 +26,12 @@
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                         <td class="py-4 px-6">{{ $task->title }}</td>
                                         <td class="py-4 px-6">{{ $task->description }}</td>
-                                        <td class="py-4 px-6"></td>
+                                        <td class="py-4 px-6">
+                                            <button class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-md"
+                                             wire:click='openCreateModal({{$task}})'>Editar</button>
+                                            <button class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md"
+                                             wire:click='deleteTask({{$task}})'>Eliminar</button>
+                                        </td>
                                     </tr>
                                 @endforeach
 
@@ -47,7 +52,8 @@
                 <div class="w-full">
                     <div class="m-8 my-20 max-w-[400px] mx-auto">
                         <div class="mb-8">
-                            <h1 class="mb-4 text-3xl font-extrabold">Nueva tarea</h1>
+                            <h1 class="mb-4 text-3xl font-extrabold">
+                                {{ isset($editingTask->id) ? 'Actualizar ' : 'Crear nueva '}}tarea</h1>
                             <form>
                                 <div class="space-y-4">
                                     <div>
@@ -66,9 +72,10 @@
                             </form>
                         </div>
                         <div class="space-y-4">
-                            <button class="p-3 bg-black rounded-full text-white w-full font-semibold" wire:click="createTask">Crear tarea
+                            <button class="p-3 bg-black rounded-full text-white w-full font-semibold" wire:click="createOrUpdateTask">
+                                {{ isset($editingTask->id) ? 'Actualizar ' : 'Crear '}}tarea
                             </button>
-                            <button class="p-3 bg-white border rounded-full w-full font-semibold" wire:click="closeCreateModal">Cancelar</button>
+                            <button class="p-3 bg-white border rounded-full w-full font-semibold" wire:click="closeCreateOrUpdateModal">Cancelar</button>
                         </div>
                     </div>
                 </div>
