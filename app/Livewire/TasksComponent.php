@@ -23,7 +23,9 @@ class TasksComponent extends Component
     public function getTasks()
     {
         $user = Auth::User();
-        $this->tasks = $user->tasks;
+        $userTasks = $user->tasks;
+        $sharedTasks = $user->sharedTasks;
+        $this->tasks =  $sharedTasks->merge($userTasks);
     }
 
     public function openCreateModal(?Task $task = null)
