@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -10,14 +11,19 @@ class TasksComponent extends Component
 {
     public $tasks = [];
     public $modal = false;
+    public $shareModal = false;
     public $title;
     public $description;
-    public $editingTask;
     public $id;
+    public $users;
+    public $user_id;
+    public $editingTask;
+    public $permission;
 
     public function mount()
     {
         $this->getTasks();
+        $this->users = User::where('id', '!=', auth()->user()->id)->get();
     }
 
     public function getTasks()
@@ -28,7 +34,7 @@ class TasksComponent extends Component
         $this->tasks =  $sharedTasks->merge($userTasks);
     }
 
-    public function openCreateModal(?Task $task = null)
+    public function openCreateOrUpdateModal(?Task $task = null)
     {
         if($task){
             $this->editingTask = $task;
@@ -44,6 +50,17 @@ class TasksComponent extends Component
     public function closeCreateOrUpdateModal()
     {
         $this->modal = false;
+    }
+
+    public function openShareModal(Task $task)
+    {
+        $this->editingTask = $task;
+        $this->shareModal = true;
+    }
+
+    public function closeShareModal()
+    {
+        $this->shareModal = false;
     }
 
     public function createOrUpdateTask()
@@ -65,6 +82,22 @@ class TasksComponent extends Component
         $this->closeCreateOrUpdateModal();
         $this->clearFields();
         $this->getTasks();
+    }
+
+    public function shareTask()
+    {
+        $user = User::find($this->user_id);
+        $user->sharedTasks()->attach($this->editingTask->id, ['permission' => $this->permission]);
+        $this->getTasks();
+        $this->closeShareModal();
+    }
+
+    public function deleteRelationshipTask(Task $task)
+    {
+        $user = auth()->user();
+        $user->sharedTasks()->detach($task->id);
+        $this->getTasks();
+        $this->closeShareModal();
     }
 
     public function deleteTask(Task $task)
