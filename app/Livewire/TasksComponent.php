@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Mail\SharedTask;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class TasksComponent extends Component
@@ -90,6 +92,8 @@ class TasksComponent extends Component
         $user->sharedTasks()->attach($this->editingTask->id, ['permission' => $this->permission]);
         $this->getTasks();
         $this->closeShareModal();
+        $this->clearFields();
+        Mail::to($user->email)->send(new SharedTask($this->editingTask, auth()->user()));
     }
 
     public function deleteRelationshipTask(Task $task)
@@ -110,6 +114,8 @@ class TasksComponent extends Component
     {
         $this->title = '';
         $this->description = '';
+        $this->user_id = '';
+        $this->permission = '';
     }
 
     public function render()
